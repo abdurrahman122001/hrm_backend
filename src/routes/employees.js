@@ -1,8 +1,11 @@
 // src/routes/employees.js
-const router = require('express').Router();
-const { getAllEmployees, createEmployee } = require('../controllers/employeeController');
+const express            = require('express');
+const { requireAuth }    = require('../middleware/auth');
+const { list, create }   = require('../controllers/employeeController');
 
-router.get('/', getAllEmployees);
-router.post('/', createEmployee);
+const router = express.Router();
+
+router.get('/',    requireAuth, list);
+router.post('/create', requireAuth, create);
 
 module.exports = router;

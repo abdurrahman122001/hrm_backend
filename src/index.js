@@ -7,6 +7,7 @@ const cron     = require('node-cron');
 
 const Employee   = require('./models/Employees');
 const Attendance = require('./models/Attendance');
+const staffRoutes = require('./routes/staff');
 
 const app = express();
 
@@ -17,8 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/employees', require('./routes/employees'));
 app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/auth', require('./routes/auth'));  // ← here
-
-mongoose
+app.use('/api/staff', staffRoutes);mongoose
   .connect(process.env.MONGODB_URI)
   .then(() => console.log('▶ MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
@@ -46,7 +46,7 @@ cron.schedule('0 0 * * *', async () => {
     // 3) grab everybody
     const allEmps = await Employee.find({}).select('_id').lean();
 
-    // 4) bulk upsert the missing ones as Pending
+    // 4) bulk upsert the missing ones as Absent
     const ops = allEmps
       .filter(e => !doneIds.has(e._id.toString()))
       .map(e => ({
